@@ -10,7 +10,7 @@ class Grounder:
         candidates = self._match_candidates(intent.target, ui_state) if intent.target else []
         element = candidates[0] if candidates else None
         confidence = 1.0 if element else 0.0
-        return GroundedTarget(element=element, confidence=confidence, alternatives=candidates[1:], window=ui_state.window)
+        return GroundedTarget(element=element, confidence=confidence, alternatives=candidates[1:])
 
     def _match_candidates(self, target: IntentTarget, ui_state: UIState) -> List[UIElement]:
         results: List[UIElement] = []

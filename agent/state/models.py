@@ -83,7 +83,6 @@ class UIElement:
     states: Sequence[ElementState] = field(default_factory=list)
     parent_element_ids: Sequence[str] = field(default_factory=list)
     near_text: Optional[str] = None
-    runtime_properties: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -130,7 +129,6 @@ class GroundedTarget:
     element: Optional[UIElement]
     confidence: float
     alternatives: List[UIElement]
-    window: Optional[WindowInfo] = None
 
 
 @dataclass(frozen=True)

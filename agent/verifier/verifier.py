@@ -22,13 +22,6 @@ class Verifier:
         status, reason = self._detect_stuck(context.current_state)
         if status == VerificationStatus.STUCK:
             return VerificationResult(status=status, failure_reason=reason, guidance_delta="replan", updated_focus_id=None)
-        if context.previous_state and not self._has_state_delta(context.previous_state, context.current_state):
-            return VerificationResult(
-                status=VerificationStatus.PARTIAL,
-                failure_reason="UI unchanged after action",
-                guidance_delta="consider alternate target",
-                updated_focus_id=context.current_state.focused_element_id,
-            )
         focus_id = context.current_state.focused_element_id
         return VerificationResult(status=VerificationStatus.SUCCESS, failure_reason=None, guidance_delta=None, updated_focus_id=focus_id)
 
@@ -42,12 +35,3 @@ class Verifier:
         if len(self._recent_signatures) == 3 and len(set(self._recent_signatures)) == 1:
             return VerificationStatus.STUCK, "screen signature unchanged"
         return VerificationStatus.SUCCESS, None
-
-    def _has_state_delta(self, prev: UIState, current: UIState) -> bool:
-        if prev.screen_signature and current.screen_signature and prev.screen_signature != current.screen_signature:
-            return True
-        if prev.focused_element_id != current.focused_element_id:
-            return True
-        if len(prev.elements) != len(current.elements):
-            return True
-        return False
