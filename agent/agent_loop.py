@@ -47,8 +47,6 @@ class AutomationAgent:
         config: AgentConfig = AgentConfig(),
     ):
         self.config = config
-        if not isinstance(self.config.log_dir, Path):
-            self.config.log_dir = Path(self.config.log_dir)
         self.config.log_dir.mkdir(parents=True, exist_ok=True)
         self.observer = observer or Observer(
             screenshot_dir=config.log_dir / "screenshots",
