@@ -31,7 +31,23 @@ The high-level loop is:
 
 ## Development Notes
 
-* Pywinauto-based observation/execution is stubbed for portability; integrate real calls in `observer/observer.py` and `executor/uia_executor.py`.
-* UI compression, OCR, and screenshot capture are extensible hooks.
-* Logging uses JSONL files per run (`logs/<run_id>.jsonl`) for replayability.
+* Windows-first: UIAutomation support is only available on Windows. The agent will warn on non-Windows hosts and gracefully fall back to mouse/keyboard stubs when UIA is unavailable.
+* Dependencies: UIA observation/execution rely on `pywinauto`; mouse/keyboard fallback uses `pyautogui` when present. Install runtime requirements with `pip install -r requirements.txt`. The agent performs lightweight dependency validation at startup.
+* UI compression, OCR, and screenshot capture are extensible hooks. Toggle them at runtime with `--disable-ocr` or `--disable-screenshots`. If `pytesseract` is installed, OCR is enabled by default; pass `--ocr-binary` to point to the Tesseract executable.
+* Logging uses versioned JSONL files per run (`logs/<run_id>.jsonl`) for replayability. Use `python -m agent.logging.replay --log-dir logs --run-id <id>` to visualize a trace.
 * Vision support is reserved for future work via extension points in perception and grounding.
+
+## Running the agent
+
+```
+python run_agent.py --log-dir logs --step-budget 10 --safety-level high --verbose
+```
+
+Flags:
+
+* `--disable-ocr` / `--disable-screenshots`: Turn off expensive capture steps.
+* `--safety-level`: One of `low`, `normal`, `high` for selector gating.
+* `--skip-validation`: Skip dependency and platform checks (not recommended).
+* `--verbose`: Enable debug logging for grounding/selector traces.
+* `--ocr-binary`: Path to the Tesseract executable for OCR.
+* `--llm-endpoint` / `--llm-api-key`: Configure an external LLM proposer endpoint; otherwise a heuristic fallback is used.

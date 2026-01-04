@@ -25,6 +25,7 @@ class ActionVerb(str, Enum):
 class TargetSource(str, Enum):
     UIA = "uia"
     OCR = "ocr"
+    SYNTHETIC = "synthetic"
 
 
 class ElementState(str, Enum):
@@ -54,6 +55,13 @@ class VerificationStatus(str, Enum):
     PARTIAL = "partial"
     FAIL = "fail"
     STUCK = "stuck"
+    UNSUPPORTED = "unsupported"
+
+
+class SafetyLevel(str, Enum):
+    LOW = "low"
+    NORMAL = "normal"
+    HIGH = "high"
 
 
 @dataclass(frozen=True)
@@ -63,6 +71,8 @@ class WindowInfo:
     exe_name: Optional[str]
     title: Optional[str]
     bbox: Optional[Sequence[int]]
+    platform: Optional[str] = None
+    warnings: Sequence[str] = field(default_factory=list)
 
     @property
     def fingerprint(self) -> str:
@@ -83,6 +93,8 @@ class UIElement:
     states: Sequence[ElementState] = field(default_factory=list)
     parent_element_ids: Sequence[str] = field(default_factory=list)
     near_text: Optional[str] = None
+    salience: float = 0.0
+    backend_ref: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -93,6 +105,7 @@ class UIState:
     focused_element_id: Optional[str]
     salient_text: List[str]
     screen_signature: Optional[str]
+    derived_from: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -100,8 +113,16 @@ class Observation:
     window: WindowInfo
     raw_tree: Any
     screenshot_path: Optional[str]
-    ocr_results: Optional[List[str]]
+    ocr_results: Optional[List["OCRSpan"]]
     timestamp: float = field(default_factory=lambda: time.time())
+    warnings: Sequence[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class OCRSpan:
+    text: str
+    bbox: Optional[Sequence[int]] = None
+    confidence: Optional[float] = None
 
 
 @dataclass(frozen=True)
